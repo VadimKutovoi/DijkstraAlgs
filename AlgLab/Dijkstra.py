@@ -1,6 +1,7 @@
 import time
 import random
 
+
 class DHeap:
     key = []
     name = []
@@ -8,7 +9,6 @@ class DHeap:
     d = int()
     name1 = int()
     key1 = int()
-
 
     def __init__(self, d_=3):
         self.d = d_
@@ -112,7 +112,7 @@ class DHeap:
         self.ascend2(i)
 
     def get_min(self):
-        #self.name[0], self.name[len(self.name) - 1] = self.name[len(self.name) - 1], self.name[len(self.name) - 1]
+        # self.name[0], self.name[len(self.name) - 1] = self.name[len(self.name) - 1], self.name[len(self.name) - 1]
         self.name1 = self.name.pop(0)
         self.key1 = self.key.pop(0)
 
@@ -126,10 +126,13 @@ class DHeap:
             self.descend2(i)
             i = i - 1
 
+
 def Dijkstra(n, s, matrix):
+    # n - nodes count, s - start node
     valid = [True] * n
     weight = [1000000] * n
     weight[s] = 0
+    up = []
     for i in range(n):
         min_weight = 1000001
         ID_min_weight = -1
@@ -141,7 +144,10 @@ def Dijkstra(n, s, matrix):
             if weight[ID_min_weight] + matrix[ID_min_weight][i] < weight[i]:
                 weight[i] = weight[ID_min_weight] + matrix[ID_min_weight][i]
         valid[ID_min_weight] = False
+        up.append(ID_min_weight)
+    print("Dijkstra path ", up)
     return weight
+
 
 def Dijkstra_DHeap(n, s, d, matrix):
     weight = [1000000] * n
@@ -172,13 +178,14 @@ def Dijkstra_Mark(n, s, matrix):
     weight = [1000000] * n
     weight[s] = 0
     h = [0] * n
+    up = []
     nq = n
     while nq > 0:
         c = 0
         while h[c] != 0:
             c += 1
         i = c
-        for k in range(c+1, n):
+        for k in range(c + 1, n):
             if h[k] == 0:
                 if weight[i] > weight[k]:
                     i = k
@@ -192,30 +199,34 @@ def Dijkstra_Mark(n, s, matrix):
                 if weight[j] > weight[i] + el:
                     weight[j] = weight[i] + el
             el_i += 1
+    #print(up)
     return weight
 
 
 random.seed()
 
-size = 4
+size = 6
 d = DHeap()
 
-#matrix = [[] for i in range(0, size)]
-#for i in range(0, size):
-#    for j in range(0, size):
-#        matrix[i].append(random.randrange(1, 100))
-
 MAX = 1000000
-matrix = [[MAX, 1, MAX, 1], [1, MAX, 2, MAX], [MAX, 2, MAX, 1], [1, MAX, 1, MAX]]
+matrix = [[MAX, 1, MAX, 2], [1, MAX, 2, MAX], [MAX, 2, MAX, 3], [2, MAX, 3, MAX]]
+matrix2 = [[MAX, 7, 9, MAX, MAX, 14],
+           [7, 0, 10, 15, MAX, MAX],
+           [9, 10, 0, 11, MAX, 2],
+           [MAX, 15, 11, 0, 6, MAX],
+           [MAX, MAX, MAX, 6, 0, 9],
+           [14, MAX, 2, MAX, 9, 0]]
 
 time1 = time.time()
-print(Dijkstra(size, 0, matrix))
+print("---------------------------------------------")
+print("Dijkstra result ", Dijkstra(size, 0, matrix2))
 print("Dijkstra time %s seconds" % (time.time() - time1))
-
+print("---------------------------------------------")
 time1 = time.time()
-print(Dijkstra_Mark(size, 0, matrix))
+print("Dijkstra_Mark result ", Dijkstra_Mark(size, 0, matrix2))
 print("Dijkstra_Mark time %s seconds" % (time.time() - time1))
-
+print("---------------------------------------------")
 time1 = time.time()
-print(Dijkstra_DHeap(size, 0, d, matrix))
+#print(Dijkstra_DHeap(size, 0, d, matrix))
 print("Dijkstra_DHeap time %s seconds" % (time.time() - time1))
+print("---------------------------------------------")
