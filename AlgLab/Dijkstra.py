@@ -6,6 +6,7 @@ class DHeap:
     key = []
     name = []
     index = []
+    len = int()
     d = int()
     name1 = int()
     key1 = int()
@@ -85,8 +86,8 @@ class DHeap:
 
         s = self.min_child(i)
         while s != 0 and self.key[i] > self.key[s]:
-            self.key[i], self.key[s] = self.key[s], self.key[i]
-            self.name[i], self.name[s] = self.name[s], self.name[i]
+            self.key[i] = self.key[s]
+            self.name[i] = self.name[s]
             self.index[self.name[i]] = i
             i = s
             s = self.min_child(i)
@@ -113,10 +114,17 @@ class DHeap:
 
     def get_min(self):
         # self.name[0], self.name[len(self.name) - 1] = self.name[len(self.name) - 1], self.name[len(self.name) - 1]
-        self.name1 = self.name.pop(0)
-        self.key1 = self.key.pop(0)
+        n = int(self.len)
+        self.name1 = self.name[0]
+        self.key1 = self.key[0]
+        self.name[0] = self.name[n - 1]
+        self.key[0] = self.key[n - 1]
+        self.name[n - 1] = self.name1
+        self.key[n - 1] = self.key1
 
-        if len(self.key) > 1:
+        self.len -= 1
+
+        if self.len > 1:
             self.descend2(0)
 
     def make(self):
@@ -125,6 +133,7 @@ class DHeap:
         while i >= 0:
             self.descend2(i)
             i = i - 1
+        self.len = len(self.name)
 
 
 def Dijkstra(n, s, matrix):
@@ -145,32 +154,40 @@ def Dijkstra(n, s, matrix):
                 weight[i] = weight[ID_min_weight] + matrix[ID_min_weight][i]
         valid[ID_min_weight] = False
         up.append(ID_min_weight)
-    print("Dijkstra path ", up)
+    print("Path   |", up)
     return weight
 
 
 def Dijkstra_DHeap(n, s, d, matrix):
     weight = [1000000] * n
-    d.name = [i for i in range(0, n)]
+    d.name = [i for i in range(n - 1, -1, -1)]
     d.key = [1000000] * size
-    d.index = [i for i in range(0, n)]
+    d.index = [i for i in range(n - 1, -1, -1)]
     d.key[s] = 0
-    nq = n
     d.make()
-    while nq > 0:
+    up = [0] * n
+    while d.len > 0:
         d.get_min()
         i = d.name1
+        print("curr min ", d.name1)
         weight[i] = d.key1
+        print("weight ", d.key1)
         p = matrix[i]
-        el_i = 0
-        for el in p:
-            k = el_i
-            jq = d.index[k]
-            if weight[k] == 1000000:
-                if d.key[jq] > weight[i] + el:
-                    d.key[jq] = weight[i] + el
-                    d.ascend2(k)
-            el_i += 1
+        for index, value in enumerate(p):
+            print("name ", d.name)
+            print("key  ", d.key)
+            print("index", d.index)
+            print(d.len)
+            j = index
+            print("j ", j)
+            jq = d.index[j]
+            print("jq ", jq)
+            if weight[jq] == 1000000:
+                if d.key[jq] > weight[i] + value:
+                    d.key[jq] = weight[i] + value
+                    d.ascend2(jq)
+                    up[j] = i
+            #print("up", up)
     return weight
 
 
@@ -199,13 +216,25 @@ def Dijkstra_Mark(n, s, matrix):
                 if weight[j] > weight[i] + el:
                     weight[j] = weight[i] + el
             el_i += 1
-    #print(up)
+        up.append(i)
+    print("Path   |", up)
     return weight
+
+
+def print_header(name):
+    line = "-" * 46
+    print(line)
+    print(" " * int((23 - len(name)/2)), name, " " * int((23 - len(name)/2)))
+    print(line)
+
+
+def print_separator():
+    print("-" * 46)
 
 
 random.seed()
 
-size = 6
+
 d = DHeap()
 
 MAX = 1000000
@@ -217,16 +246,24 @@ matrix2 = [[MAX, 7, 9, MAX, MAX, 14],
            [MAX, MAX, MAX, 6, 0, 9],
            [14, MAX, 2, MAX, 9, 0]]
 
+
+
+
+size = len(matrix)
 time1 = time.time()
-print("---------------------------------------------")
-print("Dijkstra result ", Dijkstra(size, 0, matrix2))
-print("Dijkstra time %s seconds" % (time.time() - time1))
-print("---------------------------------------------")
+
+print_header("DIJKSTRA")
+print("Result |", Dijkstra(size, 0, matrix))
+print("Time   |  %s seconds" % (time.time() - time1))
+
 time1 = time.time()
-print("Dijkstra_Mark result ", Dijkstra_Mark(size, 0, matrix2))
-print("Dijkstra_Mark time %s seconds" % (time.time() - time1))
-print("---------------------------------------------")
+print_header("DIJKSTRA MARK")
+print("Result |", Dijkstra_Mark(size, 0, matrix))
+print("Time   |  %s seconds" % (time.time() - time1))
+
 time1 = time.time()
-#print(Dijkstra_DHeap(size, 0, d, matrix))
-print("Dijkstra_DHeap time %s seconds" % (time.time() - time1))
-print("---------------------------------------------")
+print_header("DIJKSTRA DHEAP")
+print(Dijkstra_DHeap(size, 0, d, matrix))
+print("Time   |  %s seconds" % (time.time() - time1))
+
+
