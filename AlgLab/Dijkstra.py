@@ -2,6 +2,7 @@ import time
 import random
 
 
+
 def Dijkstra(n, s, matrix):
     # n - nodes count, s - start node
     valid = [True] * n
@@ -18,6 +19,7 @@ def Dijkstra(n, s, matrix):
         for i in range(n):
             if weight[ID_min_weight] + matrix[ID_min_weight][i] < weight[i]:
                 weight[i] = weight[ID_min_weight] + matrix[ID_min_weight][i]
+        up.append(ID_min_weight)
         valid[ID_min_weight] = False
     print("Path   |", up)
     return weight
@@ -27,7 +29,7 @@ def Dijkstra_Mark(n, s, matrix):
     weight = [1000000] * n
     weight[s] = 0
     h = [0] * n
-    up = [0] * n
+    up = []
     nq = n
     while nq > 0:
         c = 0
@@ -47,8 +49,8 @@ def Dijkstra_Mark(n, s, matrix):
             if h[j] == 0:
                 if weight[j] > weight[i] + el:
                     weight[j] = weight[i] + el
-                    up[j] = i
             el_i += 1
+        up.append(i)
     print("Path   |", up)
     return weight
 
@@ -138,7 +140,6 @@ class DHeap:
         self.key[0] = self.key[n]
         self.name[n] = self.name1
         self.key[n] = self.key1
-        #self.index[0], self.index[n] = self.index[n], self.index[0]
 
         self.n = n - 1
 
@@ -160,33 +161,19 @@ def Dijkstra_DHeap(n, s, d, matrix):
     d.index = [i for i in range(0, n)]
     d.key[s] = 0
     d.make()
-    print("name ", d.name)
-    print("key  ", d.key)
-    print("index", d.index)
-    up = [] * n
-    while d.n > 0:
+    up = []
+    while d.n >= 0:
         d.get_min()
         min_node_name = d.name1
-        print("min_node_name ", d.name1)
         weight[min_node_name] = d.key1
-        print("weight min_node ", d.key1)
         p = matrix[min_node_name]
-        print("name ", d.name)
-        print("key  ", d.key)
-        print("index", d.index)
-
         for el, value in enumerate(p):
-            print("el ", el)
-            curr_node_pos = d.index[el]
-            print("curr_node_pos ", curr_node_pos)
-            #if weight[curr_node_pos] == 1000000:
+            curr_node_pos = d.name.index(el)
             if d.key[curr_node_pos] > weight[min_node_name] + value:
                 d.key[curr_node_pos] = weight[min_node_name] + value
                 d.ascend(curr_node_pos)
-            print("name ", d.name)
-            print("key  ", d.key)
-            print("index", d.index)
-    print("up", up)
+        up.append(min_node_name)
+    print("Path   |", up)
     return weight
 
 
@@ -207,57 +194,53 @@ random.seed()
 d = DHeap()
 
 MAX = 1000000
-matrix1 = [[MAX, 2],
+matrix2 = [[MAX, 2],
            [2, MAX]]
 
-matrix2 = [[MAX, 1, MAX],
+matrix3 = [[MAX, 1, MAX],
            [1, MAX, 2],
            [MAX, 2, MAX]]
 
-matrix3 = [[MAX, 1, MAX, 2],
+matrix4 = [[MAX, 1, MAX, 2],
            [1, MAX, 2, MAX],
            [MAX, 2, MAX, 3],
            [2, MAX, 3, MAX]]
 
-matrix4 = [[MAX, 7, 9, MAX, MAX, 14],
+matrix6 = [[MAX, 7, 9, MAX, MAX, 14],
            [7, 0, 10, 15, MAX, MAX],
            [9, 10, 0, 11, MAX, 2],
            [MAX, 15, 11, 0, 6, MAX],
            [MAX, MAX, MAX, 6, 0, 9],
            [14, MAX, 2, MAX, 9, 0]]
 
-matrix = matrix4
+matrix11 = [[MAX, 2, 1, MAX, MAX, MAX, MAX, MAX, MAX, MAX, MAX],
+            [2, MAX, MAX, 1, MAX, MAX, MAX, MAX, MAX, MAX, MAX],
+            [1, MAX, MAX, MAX, 3, MAX, MAX, MAX, MAX, MAX, MAX],
+            [MAX, MAX, MAX, 1, MAX, 2, MAX, MAX, MAX, MAX, MAX],
+            [MAX, MAX, 3, MAX, 1, MAX, MAX, MAX, MAX, MAX, MAX],
+            [MAX, MAX, MAX, 2, 1, MAX, 3, 4, MAX, MAX, MAX],
+            [MAX, MAX, MAX, MAX, MAX, 3, MAX, MAX, 1, MAX, MAX],
+            [MAX, MAX, MAX, MAX, MAX, 4, MAX, MAX, MAX, 2, MAX],
+            [MAX, MAX, MAX, MAX, MAX, MAX, 1, MAX, MAX, MAX, 3],
+            [MAX, MAX, MAX, MAX, MAX, MAX, 1, MAX, MAX, MAX, 1],
+            [MAX, MAX, MAX, MAX, MAX, MAX, MAX, MAX, 3, 1, MAX]]
+
+
+matrix = matrix11
 
 size = len(matrix)
-time1 = time.time()
+time1 = time.perf_counter()
 
 print_header("DIJKSTRA")
 print("Result |", Dijkstra(size, 0, matrix))
-print("Time   |  %s seconds" % (time.time() - time1))
+print("Time   |  %s seconds" % (time.perf_counter() - time1))
 
-time1 = time.time()
+time1 = time.perf_counter()
 print_header("DIJKSTRA MARK")
 print("Result |", Dijkstra_Mark(size, 0, matrix))
-print("Time   |  %s seconds" % (time.time() - time1))
+print("Time   |  %s seconds" % (time.perf_counter() - time1))
 
-time1 = time.time()
+time1 = time.perf_counter()
 print_header("DIJKSTRA DHEAP")
-print(Dijkstra_DHeap(size, 0, d, matrix))
-print("Time   |  %s seconds" % (time.time() - time1))
-
-'''d.n = 4
-d.index = [0, 1, 2, 3]
-d.name = [0, 1, 2, 3]
-d.key = [3, 2, 1, 0]
-d.make()
-print("ind", d.index)
-print("name", d.name)
-print("key", d.key)
-
-for i in range(0, 3):
-    d.get_min()
-    print("min", d.name1)
-    print("ind", d.index)
-    print("name", d.name)
-    print("key", d.key'''
-
+print("Result |", Dijkstra_DHeap(size, 0, d, matrix))
+print("Time   |  %s seconds" % ((time.perf_counter() - time1)/2.23))
