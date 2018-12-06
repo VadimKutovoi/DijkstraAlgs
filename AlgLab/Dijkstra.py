@@ -59,6 +59,7 @@ class DHeap:
     key = []
     name = []
     index = []
+    len = int()
     d = int()
     n = int()
     name1 = int()
@@ -99,7 +100,8 @@ class DHeap:
         return min_child
 
     def first_child(self, i):
-        n = self.n - 1
+        #n = self.len
+        n = self.n
         first_child = i * self.d + 1
         if first_child > n:
             return 0
@@ -107,10 +109,12 @@ class DHeap:
             return first_child
 
     def last_child(self, i):
-        n = self.n - 1
+        #n = self.len - 1
+        n = self.n
         first_child = self.first_child(i)
         if first_child == 0:
             return 0
+
         else:
             return min(first_child + self.d - 1, n)
 
@@ -140,14 +144,15 @@ class DHeap:
         self.key[0] = self.key[n]
         self.name[n] = self.name1
         self.key[n] = self.key1
-
+        self.index[0], self.index[n] = self.index[n], self.index[0]
         self.n = n - 1
 
-        if self.n >= 0:
+        if self.n > 0:
             self.descend(0)
 
     def make(self):
-        self.n = len(self.name) - 1
+        self.len = len(self.name)
+        self.n = self.len - 1
         n = self.n
         while n >= 0:
             self.descend(n)
@@ -173,6 +178,10 @@ def Dijkstra_DHeap(n, s, d, matrix):
                 d.key[curr_node_pos] = weight[min_node_name] + value
                 d.ascend(curr_node_pos)
         up.append(min_node_name)
+    print(d.name)
+    print(d.key)
+    print(d.index)
+    print("Key ", d.key)
     print("Path   |", up)
     return weight
 
@@ -231,6 +240,18 @@ matrix = matrix11
 size = len(matrix)
 time1 = time.perf_counter()
 
+'''d.name = [0, 1, 2]
+d.key = [10, 5, 1]
+d.index = [0, 1, 2]
+d.make()
+
+d.descend(0)
+'''
+
+print(d.name)
+print(d.key)
+print(d.index)
+
 print_header("DIJKSTRA")
 print("Result |", Dijkstra(size, 0, matrix))
 print("Time   |  %s seconds" % (time.perf_counter() - time1))
@@ -243,4 +264,4 @@ print("Time   |  %s seconds" % (time.perf_counter() - time1))
 time1 = time.perf_counter()
 print_header("DIJKSTRA DHEAP")
 print("Result |", Dijkstra_DHeap(size, 0, d, matrix))
-print("Time   |  %s seconds" % ((time.perf_counter() - time1)/2.23))
+print("Time   |  %s seconds" % (time.perf_counter() - time1))
